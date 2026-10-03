@@ -3,6 +3,8 @@
 An emulator for the **Nokia C3-00** (RM-614) that boots the phone's own Series 40
 operating system, on the desktop (Linux, Windows) and in the browser (WebAssembly).
 
+> **Work in progress.** Expect bugs, missing features and changes.
+
 ![c3emu on the desktop: home screen, menu, settings](screenshots/desktop.png)
 
 - Runs the stock Series 40 firmware: the CPU is an ARM926EJ-S interpreter written in
@@ -57,6 +59,10 @@ drawn on the phone can be clicked too.
 ## Web
 
 ![c3emu in the browser, with the phone memory panel](screenshots/web.png)
+
+> **Expect poor performance in the web version.** It runs the same interpreter compiled
+> to WebAssembly, noticeably slower than the desktop build; animations drop frames and
+> heavy apps can be slow.
 
 Drop the firmware files on the phone screen and press *Start*. The right
 panel shows the phone memory (C:): download or delete files, drop files or whole folders
