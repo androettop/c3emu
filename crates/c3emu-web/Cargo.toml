@@ -1,0 +1,12 @@
+[package]
+name = "c3emu-web"
+description = "c3emu in the browser (WebAssembly)"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+c3emu = { path = "../c3emu", default-features = false }
+fatfs = { version = "0.3.6", default-features = false, features = ["std", "alloc"] }

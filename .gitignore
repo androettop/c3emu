@@ -1,0 +1,10 @@
+/target
+/web/c3emu_web.wasm
+/web/shell.png
+/site
+# never commit firmware or phone memory
+*.mcusw
+*.ppm_*
+*.image_*
+*.img
+c3emu-data/

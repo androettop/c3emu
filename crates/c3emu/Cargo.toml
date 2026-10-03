@@ -1,0 +1,27 @@
+[package]
+name = "c3emu"
+description = "Nokia C3-00 (Series 40) emulator"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = ["desktop"]
+# The desktop app: live window (minifb) and sound (cpal).
+desktop = ["dep:minifb", "dep:cpal"]
+# Disassembly in the debug reports (Capstone; needs a C compiler).
+disasm = ["dep:capstone"]
+# Unicorn (JIT, needs CMake and a C compiler) instead of the built-in interpreter:
+# faster, follows the wall clock, not deterministic.
+unicorn = ["dep:unicorn-engine"]
+
+[dependencies]
+png = "0.18.1"
+serde_json = "1.0.151"
+minifb = { version = "0.28.0", optional = true }
+cpal = { version = "0.15", optional = true }
+capstone = { version = "0.14", optional = true }
+unicorn-engine = { version = "2.1.5", default-features = false, features = ["arch_arm"], optional = true }
+
+[[bin]]
+name = "c3emu"
+required-features = ["desktop"]

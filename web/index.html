@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>c3emu — Nokia C3-00</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --line: #262b36; --text: #e6e8ee; --dim: #8b93a6;
+    --accent: #4f8cff; --ok: #5fcf8a; --bad: #ff6b6b; --drop: rgba(79, 140, 255, .14);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; align-items: baseline; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 17px; font-weight: 650; }
+  header span { color: var(--dim); font-size: 13px; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 460px); gap: 16px; padding: 16px 20px; }
+  @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; min-width: 0; }
+  h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: .04em; }
+  button { background: #222734; color: var(--text); border: 1px solid #323949; border-radius: 7px; padding: 6px 12px;
+    font: inherit; cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  code { font-size: 12px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .muted { color: var(--dim); }
+  .vol { display: inline-flex; align-items: center; gap: 6px; color: var(--dim); font-size: 13px; }
+  .vol input { width: 110px; accent-color: var(--accent); }
+  #volVal { width: 34px; font-variant-numeric: tabular-nums; }
+  #status { min-height: 20px; margin: 0 0 8px; font-size: 13px; text-align: center; }
+  #status.err { color: var(--bad); }
+
+  /* The phone: shell.png (803 x 1605) has a transparent 690 x 517 window at (56, 221)
+     for the screen. The shell is an overlay without pointer events; transparent key
+     areas above it (.hot) make the drawn keys clickable. */
+  #shell { position: relative; height: min(86vh, 1605px); aspect-ratio: 803 / 1605; max-width: 100%;
+    margin: 0 auto; outline: none; }
+  #shell:focus-visible { filter: drop-shadow(0 0 6px var(--accent)); }
+  #screenWrap { position: absolute; left: 6.974%; top: 13.769%; width: 85.928%; height: 32.212%;
+    background: #000; overflow: hidden; }
+  canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+  #shellImg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+  .hot { position: absolute; background: transparent; border: 0; padding: 0; border-radius: 8px; cursor: pointer; }
+  .hot:hover { background: rgba(255, 255, 255, .07); border: 0; }
+  .hot.on { background: rgba(120, 170, 255, .30); }
+  .drop { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; padding: 10px; text-align: center; font-size: 12px; border: 2px dashed #3a4256; background: #0b0d11; }
+  .drop.over, #fsList.over { background: var(--drop); border-color: var(--accent); }
+  .drop b { font-size: 14px; }
+  #files { margin: 2px 0 0; padding: 0; list-style: none; }
+  #files li { display: flex; gap: 8px; font-size: 12px; }
+  #files .k { color: var(--dim); width: 64px; text-align: right; }
+
+  details { margin-top: 12px; color: var(--dim); font-size: 13px; }
+  details table { border-collapse: collapse; margin-top: 6px; }
+  details td { padding: 2px 10px 2px 0; }
+  kbd { background: #222734; border: 1px solid #323949; border-radius: 4px; padding: 0 5px; font-size: 12px; color: var(--text); }
+  #crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 8px; font-size: 13px; }
+  #crumbs a { color: var(--accent); cursor: pointer; text-decoration: none; }
+  #fsList { border: 1px dashed transparent; border-radius: 8px; min-height: 260px; max-height: 70vh; overflow: auto; }
+  .ent { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto auto; gap: 8px; align-items: center;
+    padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .ent:hover { background: #1c2029; }
+  .ent .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ent.dir .n { cursor: pointer; color: #cfe0ff; }
+  .ent .s { color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .ent button { padding: 2px 8px; font-size: 12px; }
+  .ent.over { background: var(--drop); }
+  #fsInfo { margin-top: 8px; font-size: 12px; }
+  #fsMsg { min-height: 18px; margin-top: 6px; font-size: 13px; }
+  #fsMsg.err { color: var(--bad); }
+  .empty { padding: 30px 10px; text-align: center; color: var(--dim); }
+</style>
+</head>
+<body>
+<header>
+  <h1>c3emu</h1>
+  <span>Nokia C3-00 (RM-614) · Series 40 in WebAssembly</span>
+</header>
+<main>
+  <section id="phone">
+    <div class="row" style="justify-content:center; margin-bottom:10px">
+      <button class="primary" id="start" disabled>Start</button>
+      <button id="restart" disabled>Restart</button>
+      <button id="changeFw">Change firmware</button>
+      <button id="factory">Erase phone memory</button>
+      <label class="vol">🔊 <input type="range" id="vol" min="0" max="100" value="10" aria-label="Volume"> <span id="volVal">10%</span></label>
+    </div>
+    <div id="status" class="muted"></div>
+    <div id="shell" tabindex="0" aria-label="Phone: click it and use the keyboard">
+      <div id="screenWrap">
+        <canvas id="screen" width="320" height="240"></canvas>
+        <div class="drop" id="drop">
+          <b>Drop the firmware here</b>
+          <div class="muted"><code>*.mcusw</code> (required) · language <code>*.ppm_*</code> · factory content <code>*.image_*</code></div>
+          <div class="row"><button id="pick">Choose files…</button></div>
+          <ul id="files"></ul>
+        </div>
+      </div>
+      <img id="shellImg" src="shell.png" alt="">
+      <div id="hots"></div>
+    </div>
+    <input type="file" id="pickInput" multiple hidden>
+    <details>
+      <summary>Keyboard</summary>
+      <table>
+        <tr><td>Letters, space, <kbd>.</kbd> <kbd>,</kbd></td><td>the phone's QWERTY keys (r t y / f g h / v b n / m = 1–9)</td></tr>
+        <tr><td><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> · <kbd>Enter</kbd></td><td>D-pad · centre</td></tr>
+        <tr><td><kbd>F1</kbd> / <kbd>F2</kbd></td><td>left / right selection key</td></tr>
+        <tr><td><kbd>F3</kbd> · <kbd>End</kbd></td><td>call · end call / power</td></tr>
+        <tr><td><kbd>F4</kbd> / <kbd>F5</kbd></td><td>contacts / messaging</td></tr>
+        <tr><td><kbd>Shift</kbd> <kbd>Ctrl</kbd> <kbd>F10</kbd> <kbd>F12</kbd></td><td>shift, ctrl, Sym, Fn (unlock: Fn + left selection key)</td></tr>
+        <tr><td><kbd>Backspace</kbd> · keypad <kbd>Enter</kbd></td><td>backspace · QWERTY Enter</td></tr>
+        <tr><td colspan="2">A press shorter than 300 ms is a single press, a longer one a long press. The keys drawn on the phone can be clicked too.</td></tr>
+      </table>
+    </details>
+  </section>
+  <section id="fs">
+    <h2>Phone memory (C:)</h2>
+    <div id="crumbs"></div>
+    <div class="row" style="margin-bottom:8px">
+      <button id="up">Upload files…</button>
+      <button id="mkdir">New folder</button>
+      <button id="refresh">Refresh</button>
+    </div>
+    <input type="file" id="upInput" multiple hidden>
+    <div id="fsList"><div class="empty">Start the phone to see its memory.</div></div>
+    <div id="fsInfo" class="muted"></div>
+    <div id="fsMsg" class="muted">Drop files or folders on the list (or on a folder). Java games (<code>.jar</code> / <code>.jad</code>) are installed by opening them on the phone (Gallery / Files). The phone restarts to see changed files.</div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
