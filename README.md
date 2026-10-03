@@ -7,7 +7,7 @@ operating system, on the desktop (Linux, Windows) and in the browser (WebAssembl
 
 **Try it in the browser: <https://androettop.github.io/c3emu/>** (bring your own firmware).
 
-![c3emu on the desktop: home screen, menu, settings](screenshots/desktop.png)
+![c3emu: home screen, menu and settings of the Nokia C3-00](screenshots/c3emu.png)
 
 - Runs the stock Series 40 firmware: the CPU is an ARM926EJ-S interpreter written in
   Rust, around it the SoC devices the OS needs (timers, interrupt controller, display,
