@@ -95,6 +95,14 @@ The interpreter runs at about 100 million instructions per second; the real phon
 runs at 208 MHz, so under full load (e.g. while playing music) the emulator keeps sound
 and clocks in real time and the display drops frames.
 
+## License
+
+c3emu is free software under the [GNU General Public License v3.0 or later](LICENSE).
+
+The optional `unicorn` feature links Unicorn (GPLv2 only), which is not compatible with
+GPLv3 or with the Apache-2.0 sound library: such builds are fine for your own use but
+cannot be redistributed. The default builds (and the ones from CI) do not include it.
+
 ## Legal
 
 c3emu is an independent project for interoperability and education, not affiliated with

@@ -3,6 +3,7 @@ name = "c3emu"
 description = "Nokia C3-00 (Series 40) emulator"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
 
 [features]
 default = ["desktop"]
