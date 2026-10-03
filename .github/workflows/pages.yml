@@ -1,7 +1,4 @@
 # Deploys the web version to GitHub Pages.
-# Disabled until the repository variable PAGES_ENABLED is set to "true"
-# (Settings -> Secrets and variables -> Actions -> Variables) and Pages uses
-# "GitHub Actions" as its source (Settings -> Pages).
 name: pages
 
 on:
@@ -20,7 +17,6 @@ concurrency:
 
 jobs:
   deploy:
-    if: vars.PAGES_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

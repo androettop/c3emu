@@ -76,12 +76,6 @@ rustup target add wasm32-unknown-unknown
 cargo run --release -p c3emu-web --bin serve   # http://localhost:8080
 ```
 
-### GitHub Pages
-
-`.github/workflows/pages.yml` publishes `./site` to GitHub Pages. It is disabled until the
-repository variable `PAGES_ENABLED` is `true` (Settings → Secrets and variables →
-Actions → Variables) and Pages uses *GitHub Actions* as its source (Settings → Pages).
-
 ## Build options
 
 | Feature | |
