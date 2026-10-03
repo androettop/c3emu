@@ -5,6 +5,8 @@ operating system, on the desktop (Linux, Windows) and in the browser (WebAssembl
 
 > **Work in progress.** Expect bugs, missing features and changes.
 
+**Try it in the browser: <https://androettop.github.io/c3emu/>** (bring your own firmware).
+
 ![c3emu on the desktop: home screen, menu, settings](screenshots/desktop.png)
 
 - Runs the stock Series 40 firmware: the CPU is an ARM926EJ-S interpreter written in
@@ -64,7 +66,7 @@ drawn on the phone can be clicked too.
 > to WebAssembly, noticeably slower than the desktop build; animations drop frames and
 > heavy apps can be slow.
 
-Drop the firmware files on the phone screen and press *Start*. The right
+Open <https://androettop.github.io/c3emu/>, or build and serve it yourself (below). Drop the firmware files on the phone screen and press *Start*. The right
 panel shows the phone memory (C:): download or delete files, drop files or whole folders
 on it (the phone restarts to see them). Java games (`.jar` / `.jad`) are installed by
 opening them on the phone. Firmware and phone memory are kept in the browser
